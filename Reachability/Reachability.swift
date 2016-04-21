@@ -139,7 +139,7 @@ public class Reachability: NSObject {
     }
 
     // MARK: - *** Notifier methods ***
-    public func startNotifier() throws {
+    public func startNotifier(withImmediateCheck checkImmediately: Bool = true) throws {
 
         guard !notifierRunning else { return }
         
@@ -156,10 +156,12 @@ public class Reachability: NSObject {
             throw ReachabilityError.UnableToSetDispatchQueue
         }
 
-        // Perform an intial check
-        dispatch_async(reachabilitySerialQueue) { () -> Void in
-            let flags = self.reachabilityFlags
-            self.reachabilityChanged(flags)
+        // Perform an intial check if desired.
+        if checkImmediately {
+            dispatch_async(reachabilitySerialQueue) { () -> Void in
+                let flags = self.reachabilityFlags
+                self.reachabilityChanged(flags)
+            }
         }
         
         notifierRunning = true
